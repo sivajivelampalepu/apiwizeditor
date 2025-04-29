@@ -8,6 +8,9 @@ import {
   FormatListBulleted, FormatListNumbered, Undo, Redo,
   TableChart, InsertEmoticon, Link
 } from '@mui/icons-material';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 
 const fonts = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'];
 const sizes = [12, 14, 16, 18, 20, 22, 24,36,48,72];
@@ -58,6 +61,48 @@ export default function CustomEditor() {
     if (url) format('createLink', url);
   };
 
+
+
+  const exportToPDF = async () => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const canvas = await html2canvas(editor);
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save("document.pdf");
+  };
+
+  const exportToDoc = () => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const header = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+            xmlns:w='urn:schemas-microsoft-com:office:word' 
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'><title>Export HTML to Word</title></head><body>`;
+    const footer = `</body></html>`;
+    const content = editor.innerHTML;
+    const sourceHTML = header + content + footer;
+
+    const blob = new Blob(['\ufeff', sourceHTML], {
+      type: 'application/msword',
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'document.doc';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
 
@@ -100,6 +145,13 @@ export default function CustomEditor() {
           <MenuItem value="">Size</MenuItem>
           {sizes.map(size => <MenuItem key={size} value={size}>{size}</MenuItem>)}
         </Select>
+
+        <Tooltip title="Export as PDF">
+          <Button variant="outlined" size="small" onClick={()=>exportToPDF()}>PDF</Button>
+        </Tooltip>
+        <Tooltip title="Export as Word">
+          <Button variant="outlined" size="small" onClick={()=>exportToDoc()}>Word</Button>
+        </Tooltip>
       </Box>
 
       <Box

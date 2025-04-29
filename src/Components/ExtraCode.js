@@ -1,3 +1,6 @@
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
 export  const convertHtmlToInternalFormat = (node) => {
       let result = "";
       for (let child of node.childNodes) {
