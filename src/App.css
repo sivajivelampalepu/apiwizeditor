@@ -210,3 +210,18 @@ footer {
 [size] {
   font-size: var(--size, 12px);
 }
+
+.customscroll{
+  min-height: 300px ;
+ overflow-y: auto;
+ border:'1px solid #ccc';
+ padding:8px;
+ border-radius:4px;
+ outline: none;
+ background-color: #fff;
+ font-size: 14px;
+ line-height:1.6;
+
+}
+
+

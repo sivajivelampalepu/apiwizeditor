@@ -263,7 +263,7 @@ const applyHeading = (tag) => {
         suppressContentEditableWarning
         sx={{
           border: '1px solid #ccc',
-          minHeight: '300px',
+          height: '300px',
           padding: 2,
           borderRadius: 2,
           backgroundColor: 'white',
