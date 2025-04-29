@@ -10,6 +10,9 @@ import {
 } from '@mui/icons-material';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
+import CodeIcon from '@mui/icons-material/Code';
+import InfoIcon from '@mui/icons-material/Info';
 
 
 const fonts = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'];
@@ -103,6 +106,25 @@ export default function CustomEditor() {
     document.body.removeChild(link);
   };
 
+
+  const formatBlock = (tag) => {
+    document.execCommand('formatBlock', false, tag);
+  };
+
+  const insertCallout = () => {
+    const callout = document.createElement('div');
+    callout.style.borderLeft = '4px solid #1976d2';
+    callout.style.backgroundColor = '#e3f2fd';
+    callout.style.padding = '10px';
+    callout.style.margin = '10px 0';
+    callout.innerHTML = '🔔 <strong>Callout:</strong> You can add helpful hints here!';
+    insertHTML(callout.outerHTML);
+  };
+
+  const insertHTML = (html) => {
+    document.execCommand('insertHTML', false, html);
+  };
+
   return (
     <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
 
@@ -125,7 +147,23 @@ export default function CustomEditor() {
 
         <Tooltip title="Insert Table"><IconButton onClick={insertTable}><TableChart /></IconButton></Tooltip>
         <Tooltip title="Insert Link"><IconButton onClick={insertLink}><Link /></IconButton></Tooltip>
+        <Tooltip title="Quote">
+          <IconButton onClick={() => formatBlock('blockquote')}>
+            <FormatQuoteIcon />
+          </IconButton>
+        </Tooltip>
 
+        <Tooltip title="Code Block">
+          <IconButton onClick={() => formatBlock('pre')}>
+            <CodeIcon />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Insert Callout">
+          <IconButton onClick={insertCallout}>
+            <InfoIcon />
+          </IconButton>
+        </Tooltip>
        
         {emojis.map((e, i) => (
           <Tooltip title={`Emoji ${e}`} key={i}>
