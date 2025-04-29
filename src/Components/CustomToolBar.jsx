@@ -19,37 +19,97 @@ const CustomToolBar = ({ editorRef, insertWidget, saveAsPDF, saveAsDocument }) =
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = textarea.value.substring(start, end);
-    const newText =
-      textarea.value.substring(0, start) +
-      prefix +
-      selectedText +
-      suffix +
-      textarea.value.substring(end);
-    dispatch(updateContent(newText));
-  };
+  
+    if (!selectedText) {
+      const placeholder = "Text";
+      const newText =
+        textarea.value.substring(0, start) +
+        prefix +
+        placeholder +
+        suffix +
+        textarea.value.substring(end);
+      dispatch(updateContent(newText));
+      const newStart = start + prefix.length;
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newStart + placeholder.length;
+      textarea.focus();
+      return;
+    }
 
-  const applyHeading = (level) => {
-    const textarea = editorRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
+    let expandedStart = start;
+    let expandedEnd = end;
+    const fullText = textarea.value;
+  
+    while (expandedStart > 0 && fullText[expandedStart - 1] !== "{") {
+      expandedStart--;
+      if (fullText.substring(expandedStart).match(/^\{[^{}]+?\}/)) {
+        break;
+      }
+    }
+  
+
+    while (expandedEnd < fullText.length && fullText[expandedEnd] !== "}") {
+      expandedEnd++;
+      if (fullText.substring(expandedStart, expandedEnd + 1).match(/\{[^{}]+?\}[^{]*?\{\/[^{}]+?\}/)) {
+        break;
+      }
+    }
+
+    const textWithTags = fullText.substring(expandedStart, expandedEnd + 1);
+    const selectedTextWithoutTags = selectedText;
+    if (prefix.startsWith("{size:") && textWithTags.match(/\{size:\d+\}/)) {
+      const newText =
+        fullText.substring(0, expandedStart) +
+        prefix +
+        selectedTextWithoutTags +
+        suffix +
+        fullText.substring(expandedEnd + 1);
+  
+      dispatch(updateContent(newText));
+      const newStart = expandedStart + prefix.length + selectedTextWithoutTags.length;
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newStart;
+      textarea.focus();
+      return;
+    }
+  
+    const tagMatch = textWithTags.match(/(\{[^{}]+?\})(.*?)\{\/[^{}]+?\}/);
+    if (tagMatch) {
+      const outerPrefix = tagMatch[1]; 
+      const innerContent = tagMatch[2]; 
+      const outerSuffix = textWithTags.match(/\{\/[^{}]+?\}$/)[0]; 
+  
+    
+      const newInnerContent = prefix + innerContent + suffix;
+      const newText =
+        fullText.substring(0, expandedStart) +
+        outerPrefix +
+        newInnerContent +
+        outerSuffix +
+        fullText.substring(expandedEnd + 1);
+  
+      dispatch(updateContent(newText));
+      const newStart = expandedStart + outerPrefix.length + prefix.length + selectedTextWithoutTags.length;
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newStart;
+      textarea.focus();
+    } else {
    
-
-    const textBefore = textarea.value.substring(0, start);
-    const lastNewline = textBefore.lastIndexOf("\n") + 1;
-    const lineStart = lastNewline === 0 ? 0 : lastNewline;
-    const lineText = textarea.value.substring(lineStart, end);
-
-    const cleanLine = lineText.replace(/^#+ /, "");
-    const prefix = "#".repeat(level) + " ";
-    const newLineText = prefix + cleanLine;
-    const newText =
-      textarea.value.substring(0, lineStart) +
-      newLineText +
-      textarea.value.substring(end);
-
-    dispatch(updateContent(newText));
+      const newText =
+        fullText.substring(0, start) +
+        prefix +
+        selectedTextWithoutTags +
+        suffix +
+        fullText.substring(end);
+  
+      dispatch(updateContent(newText));
+      const newStart = start + prefix.length + selectedTextWithoutTags.length;
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newStart;
+      textarea.focus();
+    }
   };
-
+  
   const applyHighlight = (color) => {
     wrapText(`{highlight:${color}}`, "{/highlight}");
   };
@@ -66,17 +126,24 @@ const CustomToolBar = ({ editorRef, insertWidget, saveAsPDF, saveAsDocument }) =
     wrapText(`{font:${font}}`, "{/font}");
   };
 
+
   const applyAlignment = (align) => {
     const textarea = editorRef.current;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end) || "Text";
+
     const textBefore = textarea.value.substring(0, start);
     const lastNewline = textBefore.lastIndexOf("\n") + 1;
     const lineStart = lastNewline === 0 ? 0 : lastNewline;
     const lineText = textarea.value.substring(lineStart, end);
 
-    const cleanLine = lineText.replace(/\{align:.*?\}(.*?)\{\/align\}/, "$1");
-    const newLineText = `{align:${align}}${cleanLine}{/align}`;
+    const headingMatch = lineText.match(/^#+ /);
+    const headingPrefix = headingMatch ? headingMatch[0] : "";
+    const cleanLine = headingPrefix ? lineText.replace(/^#+ /, "") : lineText;
+
+    const cleanLineWithoutAlign = cleanLine.replace(/\{align:.*?\}(.*?)\{\/align\}/, "$1");
+    const newLineText = headingPrefix + `{align:${align}}${cleanLineWithoutAlign}{/align}`;
     const newText =
       textarea.value.substring(0, lineStart) +
       newLineText +
@@ -84,6 +151,22 @@ const CustomToolBar = ({ editorRef, insertWidget, saveAsPDF, saveAsDocument }) =
 
     dispatch(updateContent(newText));
     setActiveAlign(align);
+
+    const lineEnd = lineStart + newLineText.length;
+    if (align === "center") {
+      const textLength = cleanLineWithoutAlign.length;
+      const centerPosition = lineStart + headingPrefix.length + `{align:${align}}`.length + Math.floor(textLength / 2);
+      textarea.selectionStart = centerPosition;
+      textarea.selectionEnd = centerPosition;
+    } else if (align === "justify" || align === "right") {
+      textarea.selectionStart = lineEnd;
+      textarea.selectionEnd = lineEnd;
+    } else if (align === "left") {
+      const startPosition = lineStart + headingPrefix.length + `{align:${align}}`.length;
+      textarea.selectionStart = startPosition;
+      textarea.selectionEnd = startPosition;
+    }
+    textarea.focus();
   };
 
   const insertBullet = () => {
@@ -112,6 +195,8 @@ const CustomToolBar = ({ editorRef, insertWidget, saveAsPDF, saveAsDocument }) =
   const insertIcon = (icon) => {
     wrapText(`{icon:${icon}}`, "");
   };
+
+ 
 
   return (
     <div className="mb-3 d-flex align-items-center">
@@ -182,22 +267,7 @@ const CustomToolBar = ({ editorRef, insertWidget, saveAsPDF, saveAsDocument }) =
         </Select>
       </FormControl>
 
-      <FormControl variant="outlined" size="small" className="me-2">
-        <InputLabel>Heading</InputLabel>
-        <Select
-          label="Heading"
-          onChange={(e) => applyHeading(e.target.value)}
-          defaultValue=""
-        >
-          <MenuItem value="">Normal</MenuItem>
-          <MenuItem value={1}>H1</MenuItem>
-          <MenuItem value={2}>H2</MenuItem>
-          <MenuItem value={3}>H3</MenuItem>
-          <MenuItem value={4}>H4</MenuItem>
-          <MenuItem value={5}>H5</MenuItem>
-          <MenuItem value={6}>H6</MenuItem>
-        </Select>
-      </FormControl>
+     
 
       <FormControl variant="outlined" size="small" className="me-2">
         <InputLabel>Highlight</InputLabel>
@@ -244,18 +314,22 @@ const CustomToolBar = ({ editorRef, insertWidget, saveAsPDF, saveAsDocument }) =
       </FormControl>
 
       <FormControl variant="outlined" size="small" className="me-2">
-        <InputLabel>Insert Icon</InputLabel>
-        <Select
-          label="Insert Icon"
-          onChange={(e) => insertIcon(e.target.value)}
-          defaultValue=""
-        >
-          <MenuItem value="">None</MenuItem>
-          <MenuItem value="star">★ Star</MenuItem>
-          <MenuItem value="heart">♥ Heart</MenuItem>
-          <MenuItem value="check">✔ Check</MenuItem>
-        </Select>
-      </FormControl>
+  <InputLabel>Insert Icon</InputLabel>
+  <Select
+    label="Insert Icon"
+    onChange={(e) => insertIcon(e.target.value)}
+    defaultValue=""
+  >
+    <MenuItem value="">None</MenuItem>
+    <MenuItem value="star">⭐ Star</MenuItem>
+    <MenuItem value="check">✔️ Check</MenuItem>
+    <MenuItem value="heart">❤️ Heart</MenuItem>
+  
+  </Select>
+</FormControl>
+
+
+
 
       <Button
         variant="contained"

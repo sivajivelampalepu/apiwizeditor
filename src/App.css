@@ -1,3 +1,4 @@
+
 body {
   font-family: 'Arial', sans-serif;
   direction: ltr;
@@ -203,4 +204,9 @@ footer {
   margin-top: 20px;
   border-radius: 0 0 10px 10px;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+[size] {
+  font-size: var(--size, 12px);
 }
