@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/apiwizeditor/static/css/main.e634cf29.css",
-    "main.js": "/apiwizeditor/static/js/main.3acecd0b.js",
+    "main.css": "/apiwizeditor/static/css/main.c7f8a406.css",
+    "main.js": "/apiwizeditor/static/js/main.ae50d579.js",
     "static/js/977.8f0e3fa4.chunk.js": "/apiwizeditor/static/js/977.8f0e3fa4.chunk.js",
     "static/js/732.d6aa4a94.chunk.js": "/apiwizeditor/static/js/732.d6aa4a94.chunk.js",
     "static/js/453.edf20b17.chunk.js": "/apiwizeditor/static/js/453.edf20b17.chunk.js",
     "index.html": "/apiwizeditor/index.html",
-    "main.e634cf29.css.map": "/apiwizeditor/static/css/main.e634cf29.css.map",
-    "main.3acecd0b.js.map": "/apiwizeditor/static/js/main.3acecd0b.js.map",
+    "main.c7f8a406.css.map": "/apiwizeditor/static/css/main.c7f8a406.css.map",
+    "main.ae50d579.js.map": "/apiwizeditor/static/js/main.ae50d579.js.map",
     "977.8f0e3fa4.chunk.js.map": "/apiwizeditor/static/js/977.8f0e3fa4.chunk.js.map",
     "732.d6aa4a94.chunk.js.map": "/apiwizeditor/static/js/732.d6aa4a94.chunk.js.map",
     "453.edf20b17.chunk.js.map": "/apiwizeditor/static/js/453.edf20b17.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e634cf29.css",
-    "static/js/main.3acecd0b.js"
+    "static/css/main.c7f8a406.css",
+    "static/js/main.ae50d579.js"
   ]
 }
