@@ -131,7 +131,7 @@ const CustomToolBar = ({ editorRef, insertWidget, saveAsPDF, saveAsDocument }) =
     const textarea = editorRef.current;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end) || "Text";
+  
 
     const textBefore = textarea.value.substring(0, start);
     const lastNewline = textBefore.lastIndexOf("\n") + 1;

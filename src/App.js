@@ -1,6 +1,5 @@
 
 import './App.css';
-import MainEditor from './Components/MainEditor';
 import store from './Store/store';
 import { Provider } from 'react-redux';
 import Header from './Components/Header';
@@ -15,8 +14,6 @@ function App() {
       
       <div className="App">
         <Header/>
-        {/* <MainEditor />
-         */}
          <CustomEditor/>
         <Footer/>
       </div>

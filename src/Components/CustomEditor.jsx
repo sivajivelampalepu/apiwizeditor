@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import {
-  Box, Button, IconButton, MenuItem, Select, Tooltip, TextField
+  Box, Button, IconButton, MenuItem, Select, Tooltip
 } from '@mui/material';
 import {
   FormatBold, FormatItalic, FormatUnderlined, FormatColorFill, FormatColorText,
@@ -13,6 +13,12 @@ import html2canvas from 'html2canvas';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import CodeIcon from '@mui/icons-material/Code';
 import InfoIcon from '@mui/icons-material/Info';
+import SuperscriptIcon from '@mui/icons-material/ArrowUpward';     
+import SubscriptIcon from '@mui/icons-material/ArrowDownward';   
+
+const handleFormat = (command) => {
+  document.execCommand(command, false, null);
+};
 
 
 const fonts = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'];
@@ -125,8 +131,33 @@ export default function CustomEditor() {
     document.execCommand('insertHTML', false, html);
   };
 
+  const applyFontSize = (size) => {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+  
+    document.execCommand('fontSize', false, '7'); // temporary max
+  
+   
+    const fontElements = document.getElementsByTagName('font');
+    for (let i = 0; i < fontElements.length; i++) {
+      const el = fontElements[i];
+      if (el.size === '7') {
+        el.removeAttribute('size');
+        el.style.fontSize = `${size}px`;
+      }
+    }
+  };
+
+
+  
+const headings = ['Paragraph', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'];
+
+const applyHeading = (tag) => {
+  const block = tag === 'Paragraph' ? 'P' : tag;
+  document.execCommand('formatBlock', false, block);
+};
   return (
-    <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
+    <Box sx={{ p: 2, maxWidth: 1000, mx: 'auto' }}>
 
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
         <Tooltip title="Bold"><IconButton onClick={() => format('bold')}><FormatBold /></IconButton></Tooltip>
@@ -144,6 +175,31 @@ export default function CustomEditor() {
 
         <Tooltip title="Undo"><IconButton onClick={() => format('undo')}><Undo /></IconButton></Tooltip>
         <Tooltip title="Redo"><IconButton onClick={() => format('redo')}><Redo /></IconButton></Tooltip>
+
+        <Tooltip title="Superscript">
+  <IconButton onClick={() => handleFormat('superscript')}>
+    <SuperscriptIcon />
+  </IconButton>
+</Tooltip>
+
+<Tooltip title="Subscript">
+  <IconButton onClick={() => handleFormat('subscript')}>
+    <SubscriptIcon />
+  </IconButton>
+</Tooltip>
+        <Select
+  defaultValue=""
+  displayEmpty
+  onChange={(e) => applyHeading(e.target.value)}
+  size="small"
+>
+  <MenuItem value="">Heading</MenuItem>
+  {headings.map((tag) => (
+    <MenuItem key={tag} value={tag}>
+      {tag}
+    </MenuItem>
+  ))}
+</Select>
 
         <Tooltip title="Insert Table"><IconButton onClick={insertTable}><TableChart /></IconButton></Tooltip>
         <Tooltip title="Insert Link"><IconButton onClick={insertLink}><Link /></IconButton></Tooltip>
@@ -179,10 +235,19 @@ export default function CustomEditor() {
           <MenuItem value="">Font</MenuItem>
           {fonts.map(font => <MenuItem key={font} value={font}>{font}</MenuItem>)}
         </Select>
-        <Select defaultValue="" displayEmpty onChange={(e) => format('fontSize', e.target.value)} size="small">
-          <MenuItem value="">Size</MenuItem>
-          {sizes.map(size => <MenuItem key={size} value={size}>{size}</MenuItem>)}
-        </Select>
+        <Select
+  defaultValue=""
+  displayEmpty
+  onChange={(e) => applyFontSize(e.target.value)}
+  size="small"
+>
+  <MenuItem value="">Size</MenuItem>
+  {sizes.map(size => (
+    <MenuItem key={size} value={size}>
+      {size}
+    </MenuItem>
+  ))}
+</Select>
 
         <Tooltip title="Export as PDF">
           <Button variant="outlined" size="small" onClick={()=>exportToPDF()}>PDF</Button>
