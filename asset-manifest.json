@@ -1,19 +1,19 @@
 {
   "files": {
     "main.css": "/apiwizeditor/static/css/main.c60d7483.css",
-    "main.js": "/apiwizeditor/static/js/main.272705dc.js",
+    "main.js": "/apiwizeditor/static/js/main.a7eeaa69.js",
     "static/js/977.8f0e3fa4.chunk.js": "/apiwizeditor/static/js/977.8f0e3fa4.chunk.js",
     "static/js/732.d6aa4a94.chunk.js": "/apiwizeditor/static/js/732.d6aa4a94.chunk.js",
     "static/js/453.edf20b17.chunk.js": "/apiwizeditor/static/js/453.edf20b17.chunk.js",
     "index.html": "/apiwizeditor/index.html",
     "main.c60d7483.css.map": "/apiwizeditor/static/css/main.c60d7483.css.map",
-    "main.272705dc.js.map": "/apiwizeditor/static/js/main.272705dc.js.map",
+    "main.a7eeaa69.js.map": "/apiwizeditor/static/js/main.a7eeaa69.js.map",
     "977.8f0e3fa4.chunk.js.map": "/apiwizeditor/static/js/977.8f0e3fa4.chunk.js.map",
     "732.d6aa4a94.chunk.js.map": "/apiwizeditor/static/js/732.d6aa4a94.chunk.js.map",
     "453.edf20b17.chunk.js.map": "/apiwizeditor/static/js/453.edf20b17.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c60d7483.css",
-    "static/js/main.272705dc.js"
+    "static/js/main.a7eeaa69.js"
   ]
 }
